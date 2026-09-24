@@ -76,11 +76,16 @@ with the launch order reversed. It is intended to run once against a **new, empt
 ```sh
 npm install                      # installs pg, used only by this script
 # In the Neon console: create a new project, then copy its connection strings.
-cp .env.example .env             # gitignored; DIRECT_URL is required (the non-pooled endpoint)
+cp .env.example .env             # gitignored; edit it and fill in DIRECT_URL (the non-pooled endpoint)
+set -a && source .env && set +a  # load DIRECT_URL into this shell, for the two psql commands below
 psql "$DIRECT_URL" -v ON_ERROR_STOP=1 -f migration.sql
 psql "$DIRECT_URL" -v ON_ERROR_STOP=1 -f seed.sql
-npm run test:concurrency
+npm run test:concurrency         # this step loads .env itself; the export above isn't needed for it
 ```
+
+`cp .env.example .env` only creates the file — it doesn't put `DIRECT_URL` into your shell's
+environment, so the `psql` commands would otherwise see it unset. `npm run test:concurrency` doesn't
+need the `source` step: it runs `node --env-file-if-exists=.env`, which loads `.env` itself.
 
 The script writes `evidence/concurrency-test.txt` (PostgreSQL version, connection/isolation setup,
 both connections' backend PIDs, both scenarios' outcomes, and the final-state assertion; no
@@ -95,8 +100,7 @@ exactly one active assignment confirmed afterward. See
 
 ## Remaining submission work
 
-- A hosted repository and the published post about a modelling decision — neither is done; this
-  folder does not claim otherwise.
+- The published post about a modelling decision — not done; this folder does not claim otherwise.
 
 Steps 1–4 (requirements, entity model, design reasoning, and full API contracts including the
 REST/GraphQL and SSE/WebSocket analysis) are written up in [`../DESIGN.md`](../DESIGN.md), not in

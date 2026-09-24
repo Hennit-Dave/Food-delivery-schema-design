@@ -3,7 +3,7 @@
 A design document plus a small implemented PostgreSQL schema proof for a food-delivery product
 (customers order from restaurants; restaurants prepare; couriers deliver). This is **not** a
 running application — no server, payments, frontend, or authentication is implemented. See
-AGENTS.md (handoff context and agreed scope) in the repository root.
+[AGENTS.md](AGENTS.md) (handoff context and agreed scope) in the repository root.
 
 - **[DESIGN.md](DESIGN.md)** — Steps 1–4: one-page requirements, the entity model with ER/lifecycle
   diagrams, design reasoning (money, identifiers, state machine, time/deletion, constraints,

@@ -260,7 +260,7 @@ insert in one transaction.
 `201 Created`, `Location: /api/v1/orders/5b1f5e0a-2b9a-4b8b-9c34-1f7a2e6d9c11`:
 
 ```json
-{ "data": { "id": "5b1f5e0a-2b9a-4b8b-9c34-1f7a2e6d9c11", "status": "placed", "totalMinor": 3600, "currency": "USD" } }
+{ "data": { "id": "5b1f5e0a-2b9a-4b8b-9c34-1f7a2e6d9c11", "status": "placed", "totalMinor": 3200, "currency": "USD" } }
 ```
 
 Errors: `400` malformed body/missing idempotency header, `401`, `404` restaurant or menu item not
@@ -402,18 +402,46 @@ Errors: `401`, `403`, `404`, `409` order not yet delivered or already reviewed, 
 ```json
 {
   "data": [
+    { "id": "d2f1a9b3-5c6d-4e7f-8091-a2b3c4d5e6f7", "restaurantId": "8f14e45f-ceea-4f88-b9bd-3e6a1e37f2a1", "name": "Garlic bread", "description": "Toasted, buttery, four pieces", "priceMinor": 850, "currency": "USD", "isAvailable": true, "createdAt": "2026-01-06T09:00:00.000Z", "updatedAt": "2026-01-07T11:00:00.000Z" },
     { "id": "a13e1e2b-1c1e-4a4a-9c9b-8f3e2b7a9d10", "restaurantId": "8f14e45f-ceea-4f88-b9bd-3e6a1e37f2a1", "name": "Rice bowl", "description": "Vegetables and rice", "priceMinor": 1200, "currency": "USD", "isAvailable": true, "createdAt": "2026-01-05T09:00:00.000Z", "updatedAt": "2026-01-05T09:00:00.000Z" }
   ],
-  "meta": { "total": 1, "limit": 20, "offset": 0, "hasMore": false }
+  "meta": { "total": 2, "limit": 20, "offset": 0, "hasMore": false }
 }
 ```
 
 `POST /api/v1/restaurants/{restaurantId}/menu` — `name`, `priceMinor`, `currency` required;
-`description` optional; `isAvailable` defaults `true`. `201` + `Location` + the created resource.
+`description` optional; `isAvailable` defaults `true`.
+
+Request:
+
+```json
+{ "name": "Garlic bread", "priceMinor": 800, "currency": "USD", "description": "Toasted, buttery, four pieces" }
+```
+
+`201 Created`, `Location: /api/v1/restaurants/8f14e45f-ceea-4f88-b9bd-3e6a1e37f2a1/menu/d2f1a9b3-5c6d-4e7f-8091-a2b3c4d5e6f7`:
+
+```json
+{ "data": { "id": "d2f1a9b3-5c6d-4e7f-8091-a2b3c4d5e6f7", "restaurantId": "8f14e45f-ceea-4f88-b9bd-3e6a1e37f2a1", "name": "Garlic bread", "description": "Toasted, buttery, four pieces", "priceMinor": 800, "currency": "USD", "isAvailable": true, "createdAt": "2026-01-06T09:00:00.000Z", "updatedAt": "2026-01-06T09:00:00.000Z" } }
+```
 
 `PATCH /api/v1/restaurants/{restaurantId}/menu/{menuItemId}` — allows **only** `name`,
 `description`, `priceMinor`, `currency`, `isAvailable`. Not "any field except `restaurantId`" —
-`id`, `restaurantId`, and timestamps are never client-writable. `200` + resource.
+`id`, `restaurantId`, and timestamps are never client-writable.
+
+Request:
+
+```json
+{ "priceMinor": 850 }
+```
+
+`200 OK`:
+
+```json
+{ "data": { "id": "d2f1a9b3-5c6d-4e7f-8091-a2b3c4d5e6f7", "restaurantId": "8f14e45f-ceea-4f88-b9bd-3e6a1e37f2a1", "name": "Garlic bread", "description": "Toasted, buttery, four pieces", "priceMinor": 850, "currency": "USD", "isAvailable": true, "createdAt": "2026-01-06T09:00:00.000Z", "updatedAt": "2026-01-07T11:00:00.000Z" } }
+```
+
+This price change is exactly the kind of later edit Step 3 says must not reach past orders: any
+`OrderItem` that already snapshotted `unitPriceMinor: 800` for this item keeps that value.
 
 `DELETE /api/v1/restaurants/{restaurantId}/menu/{menuItemId}` — soft delete. `204 No Content`, no
 body — not a sixth JSON response shape for this route.
@@ -423,24 +451,27 @@ Errors across these four: `401`, `403` not the owning restaurant, `404`, `422` f
 **Restaurant order queue**
 
 `GET /api/v1/restaurants/{restaurantId}/orders` — actor: owning restaurant. Filter: `status`
-(comma-separated list, e.g. `?status=placed,accepted`); sort: `createdAt`, default `desc`. Lean
-rows, matching [`queries.sql`](task3-proof/queries.sql) action 2:
+(comma-separated list, e.g. `?status=placed,accepted`); sort: `createdAt`, `order`: `asc`|`desc`,
+default `desc`. Lean rows, matching [`queries.sql`](task3-proof/queries.sql) action 2:
 
 ```json
 {
   "data": [
-    { "id": "5b1f5e0a-2b9a-4b8b-9c34-1f7a2e6d9c11", "status": "placed", "totalMinor": 3600, "currency": "USD", "createdAt": "2026-09-24T09:48:44.804Z" }
+    { "id": "5b1f5e0a-2b9a-4b8b-9c34-1f7a2e6d9c11", "status": "placed", "totalMinor": 3200, "currency": "USD", "createdAt": "2026-09-24T09:48:44.804Z" }
   ],
   "meta": { "total": 1, "limit": 20, "offset": 0, "hasMore": false }
 }
 ```
 
+Errors: `401`, `403` not the owning restaurant, `400` bad list params.
+
 **Courier discovery**
 
-`GET /api/v1/deliveries/available` — actor: authenticated courier. Returns eligible **unassigned
-orders** (never fabricated `Delivery` rows), oldest first — this is the only order and is not
-client-configurable, since fairness is the point of "oldest first". *(completion decision: no
-`sort` param exposed here.)*
+`GET /api/v1/deliveries/available` — actor: authenticated courier. Filter: `restaurantId`
+(optional, narrow to one restaurant). Sort: `createdAt`, `order`: `asc`|`desc`, default `asc`
+*(completion decision: oldest-first stays the default for fairness — a courier calling this with no
+params still sees the same order as before — but, like every other list here, it is now
+overridable)*. Returns eligible **unassigned orders** (never fabricated `Delivery` rows):
 
 ```json
 {
@@ -451,22 +482,113 @@ client-configurable, since fairness is the point of "oldest first". *(completion
 }
 ```
 
+Errors: `401`, `400` bad list params.
+
 **Additional reads** *(completion decisions — added to close gaps the brief left implicit)*
 
-- `GET /api/v1/restaurants` — restaurant discovery for browsing. Filter: `q` (case-insensitive
-  substring match on `name`); sort: `name asc` only; excludes soft-deleted restaurants.
-- `GET /api/v1/orders/{orderId}` — full order detail, actor: owning customer, owning restaurant, or
-  the assigned courier. Nests `items[]` (always fetched with the order, per the "≥1 item" invariant)
-  but **not** delivery/review — those have their own reads below, to avoid null-heavy payloads on
-  every order fetch.
-- `GET /api/v1/orders/{orderId}/delivery` — read the delivery (the natural target of the `Location`
-  header from action 3); same actor set as order detail.
-- `GET /api/v1/orders/{orderId}/review` — read a single order's review; same actor set.
-- `GET /api/v1/me/orders` — the authenticated customer's own order history, using the
-  `customer_orders` index. Filter: `status` (comma list); sort: `createdAt desc` default.
-- `GET /api/v1/restaurants/{restaurantId}/reviews` — public, unauthenticated: restaurant reviews are
-  reputation information a prospective customer needs *before* ordering, unlike writing one. Sort:
-  `createdAt desc` default; excludes soft-deleted reviews.
+`GET /api/v1/restaurants` — restaurant discovery for browsing, unauthenticated. Filter: `q`
+(case-insensitive substring match on `name`); sort: `name asc` only (a directory listing has one
+natural order; every other list here exposes `order`, this one doesn't need to). Excludes
+soft-deleted restaurants.
+
+```json
+{
+  "data": [
+    { "id": "8f14e45f-ceea-4f88-b9bd-3e6a1e37f2a1", "name": "Kitchen 5", "pickupAddress": { "line1": "12 Market Street", "city": "Chicago", "postcode": "60601" }, "createdAt": "2026-01-01T00:00:00.000Z", "updatedAt": "2026-01-01T00:00:00.000Z" }
+  ],
+  "meta": { "total": 1, "limit": 20, "offset": 0, "hasMore": false }
+}
+```
+
+Errors: `400` bad list params.
+
+`GET /api/v1/orders/{orderId}` — full order detail. Actor: owning customer, owning restaurant, or
+the assigned courier. Nests `items[]` (always fetched with the order, per the "≥1 item" invariant)
+but **not** delivery/review — those have their own reads below, to avoid null-heavy payloads on
+every order fetch.
+
+```json
+{
+  "data": {
+    "id": "5b1f5e0a-2b9a-4b8b-9c34-1f7a2e6d9c11",
+    "customerId": "3c9e1a2b-6f4d-4b8a-9e21-7a5c8d3f10a2",
+    "restaurantId": "8f14e45f-ceea-4f88-b9bd-3e6a1e37f2a1",
+    "status": "accepted",
+    "deliveryAddressSnapshot": { "line1": "45 Lake Street", "city": "Chicago", "postcode": "60601" },
+    "totalMinor": 3200,
+    "currency": "USD",
+    "createdAt": "2026-09-24T09:48:44.804Z",
+    "updatedAt": "2026-09-24T10:15:00.000Z",
+    "items": [
+      { "id": "9c1b2a3d-4e5f-4071-8293-a4b5c6d7e8f9", "menuItemId": "a13e1e2b-1c1e-4a4a-9c9b-8f3e2b7a9d10", "quantity": 2, "unitPriceMinor": 1200, "currency": "USD" },
+      { "id": "e4f5a6b7-8c9d-4e0f-a1b2-c3d4e5f6a7b8", "menuItemId": "d2f1a9b3-5c6d-4e7f-8091-a2b3c4d5e6f7", "quantity": 1, "unitPriceMinor": 800, "currency": "USD" }
+    ]
+  }
+}
+```
+
+Errors: `401`, `403` not customer/restaurant/courier on this order, `404`.
+
+`GET /api/v1/orders/{orderId}/delivery` — read the delivery (the natural target of the `Location`
+header from action 3). Same actor set as order detail. Bare `Delivery` fields only — no
+`orderStatus` convenience field here, unlike the PATCH response, since a plain read can just fetch
+order status separately if it needs it.
+
+```json
+{
+  "data": {
+    "id": "4e5f6071-8a2b-4c3d-9e5f-6071829a3b4c",
+    "orderId": "5b1f5e0a-2b9a-4b8b-9c34-1f7a2e6d9c11",
+    "courierId": "9a2b3c4d-5e6f-4708-9a1b-2c3d4e5f6071",
+    "assignedAt": "2026-09-24T10:20:00.000Z",
+    "pickedUpAt": "2026-09-24T10:40:00.000Z",
+    "deliveredAt": null
+  }
+}
+```
+
+Errors: `401`, `403`, `404` order not found or has no delivery yet.
+
+`GET /api/v1/orders/{orderId}/review` — read a single order's review. Same actor set as order
+detail.
+
+```json
+{ "data": { "id": "7071829a-3b4c-4d5e-8f60-71829a3b4c5d", "orderId": "5b1f5e0a-2b9a-4b8b-9c34-1f7a2e6d9c11", "rating": 5, "comment": "Great food!", "createdAt": "2026-09-24T12:00:00.000Z" } }
+```
+
+Errors: `401`, `403`, `404` order not found or has no review yet.
+
+`GET /api/v1/me/orders` — the authenticated customer's own order history, using the
+`customer_orders` index. Filter: `status` (comma list); sort: `createdAt`, `order`: `asc`|`desc`,
+default `desc`.
+
+```json
+{
+  "data": [
+    { "id": "5b1f5e0a-2b9a-4b8b-9c34-1f7a2e6d9c11", "restaurantId": "8f14e45f-ceea-4f88-b9bd-3e6a1e37f2a1", "status": "accepted", "totalMinor": 3200, "currency": "USD", "createdAt": "2026-09-24T09:48:44.804Z" }
+  ],
+  "meta": { "total": 1, "limit": 20, "offset": 0, "hasMore": false }
+}
+```
+
+Errors: `401`, `400` bad list params.
+
+`GET /api/v1/restaurants/{restaurantId}/reviews` — public, unauthenticated: restaurant reviews are
+reputation information a prospective customer needs *before* ordering, unlike writing one. Filter:
+`rating` (optional, exact match 1–5); sort: `createdAt`, `order`: `asc`|`desc`, default `desc`.
+Excludes soft-deleted reviews. No `orderId` in the row — that's an internal reference, not something
+a public review listing needs to expose.
+
+```json
+{
+  "data": [
+    { "id": "7071829a-3b4c-4d5e-8f60-71829a3b4c5d", "rating": 5, "comment": "Great food!", "createdAt": "2026-09-24T12:00:00.000Z" }
+  ],
+  "meta": { "total": 1, "limit": 20, "offset": 0, "hasMore": false }
+}
+```
+
+Errors: `400` bad list params, `404` restaurant not found.
 
 ### Supported operations audit
 
@@ -497,7 +619,7 @@ response is **illustrative only — it was not captured from a running API** (no
     {
       "id": "5b1f5e0a-2b9a-4b8b-9c34-1f7a2e6d9c11",
       "status": "placed",
-      "totalMinor": 3600,
+      "totalMinor": 3200,
       "currency": "USD",
       "createdAt": "2026-09-24T09:48:44.804Z",
       "restaurant": { "id": "8f14e45f-ceea-4f88-b9bd-3e6a1e37f2a1", "name": "Kitchen 5", "pickupAddress": { "line1": "12 Market Street", "city": "Chicago", "postcode": "60601" }, "createdAt": "2026-01-01T00:00:00.000Z", "updatedAt": "2026-01-01T00:00:00.000Z" },
@@ -505,6 +627,10 @@ response is **illustrative only — it was not captured from a running API** (no
         {
           "id": "9c1b2a3d-4e5f-4071-8293-a4b5c6d7e8f9", "quantity": 2, "unitPriceMinor": 1200, "currency": "USD",
           "menuItem": { "id": "a13e1e2b-1c1e-4a4a-9c9b-8f3e2b7a9d10", "restaurantId": "8f14e45f-ceea-4f88-b9bd-3e6a1e37f2a1", "name": "Rice bowl", "description": "Vegetables and rice", "priceMinor": 1200, "currency": "USD", "isAvailable": true, "createdAt": "2026-01-05T09:00:00.000Z", "updatedAt": "2026-01-05T09:00:00.000Z" }
+        },
+        {
+          "id": "e4f5a6b7-8c9d-4e0f-a1b2-c3d4e5f6a7b8", "quantity": 1, "unitPriceMinor": 800, "currency": "USD",
+          "menuItem": { "id": "d2f1a9b3-5c6d-4e7f-8091-a2b3c4d5e6f7", "restaurantId": "8f14e45f-ceea-4f88-b9bd-3e6a1e37f2a1", "name": "Garlic bread", "description": "Toasted, buttery, four pieces", "priceMinor": 850, "currency": "USD", "isAvailable": true, "createdAt": "2026-01-06T09:00:00.000Z", "updatedAt": "2026-01-07T11:00:00.000Z" }
         }
       ],
       "delivery": null,
@@ -517,9 +643,13 @@ response is **illustrative only — it was not captured from a running API** (no
 
 The restaurant object (already known — it's in the URL), the full `menuItem` object
 (`description`/`isAvailable` a queue view never needs), and `delivery`/`review` nulls repeat on
-**every** row, and that weight compounds with queue size. Our actual documented route above returns
-exactly `{id, status, totalMinor, currency, createdAt}` per order — the same facts a GraphQL query
-would ask for, achieved through deliberate endpoint design rather than a query language.
+**every** row, and that weight compounds with queue size. Notice item 2's `unitPriceMinor` (800, the
+historical snapshot from when it was ordered) already disagrees with its nested `menuItem.priceMinor`
+(850, today's price, after the menu edit shown above) — one more reason naively nesting the *current*
+menu item on a historical order is actively misleading, not just heavy. Our actual documented route
+above returns exactly `{id, status, totalMinor, currency, createdAt}` per order — the same facts a
+GraphQL query would ask for, achieved through deliberate endpoint design rather than a query
+language.
 
 **The GraphQL alternative.** Same client need — a restaurant ops dashboard's live queue — wants
 exactly those five fields, nothing nested:
@@ -544,7 +674,7 @@ Hypothetical matching response — no GraphQL server exists in this repository:
       "orders": {
         "total": 1,
         "items": [
-          { "id": "5b1f5e0a-2b9a-4b8b-9c34-1f7a2e6d9c11", "status": "placed", "totalMinor": 3600, "currency": "USD", "createdAt": "2026-09-24T09:48:44.804Z" }
+          { "id": "5b1f5e0a-2b9a-4b8b-9c34-1f7a2e6d9c11", "status": "placed", "totalMinor": 3200, "currency": "USD", "createdAt": "2026-09-24T09:48:44.804Z" }
         ]
       }
     }
