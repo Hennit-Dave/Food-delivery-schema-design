@@ -23,5 +23,4 @@ npm test
 Creates a fresh in-memory PostgreSQL database (PGlite) and rewrites the evidence files; touches
 nothing outside that in-memory instance.
 
-No secrets are committed. `task3-proof/.env` (real Neon credentials, if added locally) is
-gitignored; only `task3-proof/.env.example` is tracked.
+
