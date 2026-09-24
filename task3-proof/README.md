@@ -98,10 +98,6 @@ contending connection was rejected specifically with `one_active_delivery_per_co
 exactly one active assignment confirmed afterward. See
 [`evidence/concurrency-test.txt`](evidence/concurrency-test.txt) for the full output.
 
-## Remaining submission work
-
-- The published post about a modelling decision — not done; this folder does not claim otherwise.
-
 Steps 1–4 (requirements, entity model, design reasoning, and full API contracts including the
 REST/GraphQL and SSE/WebSocket analysis) are written up in [`../DESIGN.md`](../DESIGN.md), not in
 this file.
