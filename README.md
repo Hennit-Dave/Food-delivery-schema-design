@@ -23,23 +23,5 @@ npm test
 Creates a fresh in-memory PostgreSQL database (PGlite) and rewrites the evidence files; touches
 nothing outside that in-memory instance.
 
-## Status
-
-- [x] DESIGN.md covers Steps 1–4, traced to the five main actions, with worked JSON examples.
-- [x] ER and lifecycle diagrams exported to SVG/PNG (`task3-proof/diagrams/`) and verified against
-      `migration.sql`, including nullable fields and `deletedAt`.
-- [x] Schema proof passes: migration, seed (1,200 orders), five requirement-driven queries, two
-      query plans confirmed on their intended indexes, three invalid inserts rejected by the
-      database (`task3-proof/evidence/`).
-- [x] **Neon two-connection concurrency test** — run against a fresh Neon project (PostgreSQL 18.6):
-      genuine blocking observed, both connections confirmed distinct by backend PID, and the
-      contending connection rejected specifically with `one_active_delivery_per_courier` in both
-      launch orders. See `task3-proof/evidence/concurrency-test.txt` and
-      [task3-proof/README.md](task3-proof/README.md#neon-two-connection-concurrency-test).
-- [x] **Screenshots** of the three rejected inserts —
-      `task3-proof/evidence/constraint-results-screenshot.png`.
-- [ ] **Repository hosting and the public post** about a modelling decision — neither is done; not
-      published or pushed without explicit authorisation.
-
 No secrets are committed. `task3-proof/.env` (real Neon credentials, if added locally) is
 gitignored; only `task3-proof/.env.example` is tracked.
