@@ -394,8 +394,9 @@ Errors: `401`, `403`, `404`, `409` order not yet delivered or already reviewed, 
 
 **Menu management** — actor: owning restaurant for writes; browsing is unauthenticated.
 
-`GET /api/v1/restaurants/{restaurantId}/menu` — filters: `available` (boolean); sort:
-`name`|`priceMinor`, `order`: `asc`|`desc`; excludes soft-deleted items.
+`GET /api/v1/restaurants/{restaurantId}/menu` — filter: `available` (optional boolean; omitted
+returns both available and unavailable items). Sort: `name`|`priceMinor`, default `name`; `order`:
+`asc`|`desc`, default `asc`. Excludes soft-deleted items.
 
 `200 OK`:
 
@@ -487,9 +488,8 @@ Errors: `401`, `400` bad list params.
 **Additional reads** *(completion decisions — added to close gaps the brief left implicit)*
 
 `GET /api/v1/restaurants` — restaurant discovery for browsing, unauthenticated. Filter: `q`
-(case-insensitive substring match on `name`); sort: `name asc` only (a directory listing has one
-natural order; every other list here exposes `order`, this one doesn't need to). Excludes
-soft-deleted restaurants.
+(case-insensitive substring match on `name`); sort: `name` (only field), `order`: `asc`|`desc`,
+default `asc`. Excludes soft-deleted restaurants.
 
 ```json
 {
@@ -689,10 +689,15 @@ earn its cost when *multiple, materially different clients* (e.g. a courier app,
 dashboard, and a customer-facing app) need meaningfully different nested shapes from the same
 underlying graph; raw user count alone is not that threshold. GraphQL also does not automatically
 remove server-side complexity: someone still writes resolvers, still enforces the same
-ownership/role checks per field or type, and still has to bound query cost (depth/complexity
-limits) to avoid a client requesting an expensive nested fan-out — the classic resolver N+1 problem
-this schema's `restaurant_orders`/`assignable_orders` indexes were built to avoid at the REST layer
-would need the equivalent (batching/dataloader-style resolvers) at the GraphQL layer instead.
+ownership/role checks per field or type, and still has to guard against the classic resolver N+1
+problem — a naive `orders { items { menuItem { ... } } }` resolver that issues one query per item
+instead of one for the whole page. Indexes don't fix that: they make each individual query faster,
+not fewer in number. What actually avoids N+1 is the same technique this schema's own queries
+already use — a single joined or batched query per request, like `restaurant_orders`'s query or
+`assignable_orders`'s anti-join — done at the GraphQL layer through batching (DataLoader-style) or
+resolvers that fetch a whole set of parents at once rather than per row. Query-cost limits
+(depth/complexity) are a separate concern on top of that: bounding how expensive one request is
+allowed to be, not a substitute for avoiding N+1 in the first place.
 
 ### SSE vs WebSocket
 
