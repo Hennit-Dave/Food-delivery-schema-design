@@ -1,0 +1,29 @@
+Command context: node concurrency-test.mjs (two node-postgres Client connections to DIRECT_URL)
+PostgreSQL: PostgreSQL 18.6 (6569466) on aarch64-unknown-linux-gnu, compiled by gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, 64-bit
+Endpoint: DIRECT_URL (non-pooled); two independent physical connections, confirmed below by distinct backend PIDs.
+Isolation: READ COMMITTED, set explicitly on both sessions.
+Safety nets: lock_timeout=15000ms on the contending session, 1500ms blocking-confirmation window, 60000ms whole-script watchdog.
+
+--- Scenario: A holds the lock first, B contends ---
+Courier: Courier 2 (f5c77abe-0bae-4039-bbaa-480b33fb05c0)
+Connection A order: d96b2c9b-3886-4cee-812f-4e6313bd1ed7  |  Connection B order: 33ab1d2e-225b-442d-9fe8-6198c9868173
+Connection A backend pid=1760  |  Connection B backend pid=1771 (two distinct physical connections)
+Connection A inserted its assignment and is holding the transaction open (not committed yet).
+Connection B is still blocked after 1500ms, as expected (waiting on the courier-row lock Connection A holds).
+Connection A committed.
+Connection B rejected: [23514] one_active_delivery_per_courier (constraint: one_active_delivery_per_courier)
+Final state: courier has 1 active assignment(s) (expected 1).
+Scenario PASSED.
+
+--- Scenario: B holds the lock first, A contends (reversed launch order) ---
+Courier: Courier 3 (c2d61695-58e5-421d-ad8c-3a5dc42ec740)
+Connection B order: 424cbacf-1f59-42a8-a7fc-eb4598bfadb8  |  Connection A order: fa1a7b72-f06e-4282-854b-20e1c2c19f64
+Connection B backend pid=1771  |  Connection A backend pid=1760 (two distinct physical connections)
+Connection B inserted its assignment and is holding the transaction open (not committed yet).
+Connection A is still blocked after 1500ms, as expected (waiting on the courier-row lock Connection B holds).
+Connection B committed.
+Connection A rejected: [23514] one_active_delivery_per_courier (constraint: one_active_delivery_per_courier)
+Final state: courier has 1 active assignment(s) (expected 1).
+Scenario PASSED.
+
+

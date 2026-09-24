@@ -1,0 +1,5 @@
+PASS empty order: order_requires_items
+PASS total mismatch: order_total_matches_items
+PASS forbidden state transition: invalid_order_transition: placed -> delivered
+PASS immutable review order: immutable field: review.order_id
+PASS historical prices survive menu price changes

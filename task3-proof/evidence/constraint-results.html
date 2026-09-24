@@ -1,0 +1,5 @@
+<!doctype html><html><meta charset="utf-8"><title>Executed database constraint checks</title><style>body{font:17px system-ui;max-width:1080px;margin:40px;color:#172128;background:#f6f8fa}h1{font-size:28px}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:white;padding:24px;border:1px solid #ccd4da;line-height:1.7}small{color:#4d5d68}</style><h1>Task 3 — rejected invalid inserts</h1><p>Actual results from executing invalid-inserts.sql against the migrated and seeded database.</p><pre>PASS invalid insert 1: new row for relation "order_item" violates check constraint "order_item_quantity_check"
+
+PASS invalid insert 2: review_requires_delivered_order
+
+PASS invalid insert 3: one_active_delivery_per_courier</pre><small>PostgreSQL 18.3 (PGlite 0.5.8) on wasm32-unknown-emscripten, compiled by emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 3.1.74 (1092ec30a3fb1d46b1782ff1b4db5094d3d06ae5), 32-bit<br>Single-connection execution; concurrent assignment race not tested.</small></html>

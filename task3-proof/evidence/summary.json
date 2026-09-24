@@ -1,0 +1,29 @@
+{
+  "runtime": "PostgreSQL 18.3 (PGlite 0.5.8) on wasm32-unknown-emscripten, compiled by emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 3.1.74 (1092ec30a3fb1d46b1782ff1b4db5094d3d06ae5), 32-bit",
+  "counts": [
+    {
+      "entity": "orders",
+      "count": 1200
+    },
+    {
+      "entity": "order_item",
+      "count": 1200
+    },
+    {
+      "entity": "delivery",
+      "count": 1141
+    },
+    {
+      "entity": "review",
+      "count": 380
+    }
+  ],
+  "actionQueriesPassed": 5,
+  "invalidInsertsRejected": 3,
+  "additionalChecks": 5,
+  "indexesObserved": [
+    "restaurant_orders",
+    "assignable_orders"
+  ],
+  "concurrencyTest": "NOT RUN: embedded single-connection runtime; native server blocked by sandbox shared-memory restriction"
+}

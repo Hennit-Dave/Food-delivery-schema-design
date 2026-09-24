@@ -1,0 +1,168 @@
+[
+  {
+    "action": 1,
+    "rows": [
+      {
+        "id": "646d7174-e44b-439b-8be5-9585c7e27b4b",
+        "name": "Rice bowl",
+        "price_minor": 1200,
+        "currency": "USD"
+      }
+    ]
+  },
+  {
+    "action": 2,
+    "rows": [
+      {
+        "id": "235004fc-f277-48ac-9ca7-9c5757d1ecb6",
+        "status": "placed",
+        "total_minor": 2400,
+        "currency": "USD",
+        "created_at": "2026-09-24T08:59:32.100Z"
+      }
+    ]
+  },
+  {
+    "action": 3,
+    "rows": [
+      {
+        "id": "65adfd50-501a-457d-be97-4d7642c0d418",
+        "restaurant_id": "0a9b3436-1ab7-4217-adb1-101ece811942",
+        "status": "accepted",
+        "created_at": "2026-09-24T08:20:32.100Z"
+      },
+      {
+        "id": "68da0858-8ac9-4399-a79d-526c8b90a0ec",
+        "restaurant_id": "1eb8cbb5-6c74-4f8c-a678-8032070f12a6",
+        "status": "accepted",
+        "created_at": "2026-09-24T08:21:32.100Z"
+      },
+      {
+        "id": "1659b4c6-d443-41e7-b8ae-4efedda978a1",
+        "restaurant_id": "20ccd8c3-23f6-4b4f-9601-8df7d61c6215",
+        "status": "accepted",
+        "created_at": "2026-09-24T08:22:32.100Z"
+      },
+      {
+        "id": "56b4d9ae-b793-4b14-82a5-4439dfdaddef",
+        "restaurant_id": "18fe1bcd-ecc2-443f-b596-53560d2f283a",
+        "status": "accepted",
+        "created_at": "2026-09-24T08:23:32.100Z"
+      },
+      {
+        "id": "15fb1598-6f1b-448c-9c14-55d962d616b6",
+        "restaurant_id": "d55b38a6-f544-49c0-9f24-61c35705c37e",
+        "status": "accepted",
+        "created_at": "2026-09-24T08:24:32.100Z"
+      },
+      {
+        "id": "f05b68ee-988d-4533-af71-670673625f5b",
+        "restaurant_id": "7afaf98a-04c0-4962-88c7-d6e68d8c1e98",
+        "status": "accepted",
+        "created_at": "2026-09-24T08:25:32.100Z"
+      },
+      {
+        "id": "d4354f8e-9d7b-4f1a-bede-94c68ab873dc",
+        "restaurant_id": "7730ce49-0ca8-4965-9989-4d48bba97f94",
+        "status": "accepted",
+        "created_at": "2026-09-24T08:26:32.100Z"
+      },
+      {
+        "id": "84e3ae24-0071-4679-9101-81ba997308e9",
+        "restaurant_id": "484ee6fe-dfa4-4ba7-ba14-4ec51237c95b",
+        "status": "accepted",
+        "created_at": "2026-09-24T08:27:32.100Z"
+      },
+      {
+        "id": "dcaa06c6-e2ed-407e-b59a-9c85ef127fe8",
+        "restaurant_id": "0a3157d7-1c7e-45a9-bd17-1e0a192cde4f",
+        "status": "accepted",
+        "created_at": "2026-09-24T08:28:32.100Z"
+      },
+      {
+        "id": "78663e87-1e8b-456f-9e87-c53ea36143b2",
+        "restaurant_id": "1fc2082a-9260-4302-ad19-ca9313ea3711",
+        "status": "accepted",
+        "created_at": "2026-09-24T08:29:32.100Z"
+      },
+      {
+        "id": "6b2cc620-71cd-4712-8a49-1eb13069d9fd",
+        "restaurant_id": "6f8cd2f3-b992-4c22-b292-f745c9ff84db",
+        "status": "accepted",
+        "created_at": "2026-09-24T08:30:32.100Z"
+      },
+      {
+        "id": "53cdc23b-12e5-4af0-8e2f-de44984d5f2f",
+        "restaurant_id": "ce1cc8c4-d20c-4391-9126-0aceccfefcf2",
+        "status": "accepted",
+        "created_at": "2026-09-24T08:31:32.100Z"
+      },
+      {
+        "id": "5e456aea-df13-4c5b-b70a-69a3fcbc955b",
+        "restaurant_id": "c0e76bef-4aa6-479a-a040-9f205f6512ef",
+        "status": "accepted",
+        "created_at": "2026-09-24T08:32:32.100Z"
+      },
+      {
+        "id": "3208d3c9-304f-4590-88bc-c26769b384b6",
+        "restaurant_id": "7c9e583d-24f1-4a23-9e3d-41bed4d8b860",
+        "status": "accepted",
+        "created_at": "2026-09-24T08:33:32.100Z"
+      },
+      {
+        "id": "e3d473be-2d23-4e29-9ffc-9b6a3feb0bd9",
+        "restaurant_id": "0e2ccfce-29b1-4013-bece-abbc994c6b52",
+        "status": "accepted",
+        "created_at": "2026-09-24T08:34:32.100Z"
+      },
+      {
+        "id": "ff190edf-1fb8-49d7-a1dd-c31fe71db0a2",
+        "restaurant_id": "5e573e88-e8bc-43ec-a59c-a2bfd4da8133",
+        "status": "accepted",
+        "created_at": "2026-09-24T08:35:32.100Z"
+      },
+      {
+        "id": "85fa40fb-8d38-429f-bf1c-8d8da087b535",
+        "restaurant_id": "27de306c-c328-47c1-a21c-73900ccd1859",
+        "status": "accepted",
+        "created_at": "2026-09-24T08:36:32.100Z"
+      },
+      {
+        "id": "d88250ec-91be-48ee-a4b6-79678fa7003c",
+        "restaurant_id": "d4815cec-c0c1-436f-9aa0-a5e83473edfc",
+        "status": "accepted",
+        "created_at": "2026-09-24T08:37:32.100Z"
+      },
+      {
+        "id": "553195af-f830-46f7-8e4a-7204ba5b6326",
+        "restaurant_id": "be507991-b876-4329-9378-0a514f415abf",
+        "status": "accepted",
+        "created_at": "2026-09-24T08:38:32.100Z"
+      },
+      {
+        "id": "29b0c8f4-4681-4a30-8cff-feadbf4255b3",
+        "restaurant_id": "b0783a9d-0fad-4ae0-97a1-13ec9b714337",
+        "status": "accepted",
+        "created_at": "2026-09-24T08:39:32.100Z"
+      }
+    ]
+  },
+  {
+    "action": 4,
+    "rows": [
+      {
+        "id": "68070cd6-80ac-4c2e-9684-aa11cc5b3de7",
+        "status": "accepted",
+        "updated_at": "2026-09-24T09:18:33.540Z"
+      }
+    ]
+  },
+  {
+    "action": 5,
+    "rows": [
+      {
+        "id": "8b32a6a1-697d-4a2d-a834-b526e38a36c8"
+      }
+    ]
+  }
+]

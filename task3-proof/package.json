@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "@electric-sql/pglite": "0.5.8"
+  },
+  "devDependencies": {
+    "pg": "8.13.1"
+  },
+  "name": "food-delivery-task3-proof",
+  "private": true,
+  "scripts": {
+    "test": "node run-proof.mjs",
+    "test:concurrency": "node --env-file-if-exists=.env concurrency-test.mjs"
+  }
+}

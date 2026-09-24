@@ -1,0 +1,39 @@
+PostgreSQL 18.3 (PGlite 0.5.8) on wasm32-unknown-emscripten, compiled by emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 3.1.74 (1092ec30a3fb1d46b1782ff1b4db5094d3d06ae5), 32-bit
+
+QUERY PLAN 1
+Limit  (cost=1.58..9.60 rows=1 width=45) (actual time=0.061..0.064 rows=1.00 loops=1)
+  Buffers: shared hit=4
+  InitPlan 1
+    ->  Seq Scan on restaurant  (cost=0.00..1.30 rows=1 width=16) (actual time=0.030..0.034 rows=1.00 loops=1)
+          Filter: (name = 'Kitchen 5'::text)
+          Rows Removed by Filter: 23
+          Buffers: shared hit=1
+  ->  Index Scan using restaurant_orders on orders  (cost=0.28..8.30 rows=1 width=45) (actual time=0.056..0.057 rows=1.00 loops=1)
+        Index Cond: ((restaurant_id = (InitPlan 1).col1) AND (status = 'placed'::text))
+        Index Searches: 1
+        Buffers: shared hit=4
+Planning Time: 0.144 ms
+Execution Time: 0.109 ms
+
+QUERY PLAN 2
+Limit  (cost=174.02..174.02 rows=1 width=49) (actual time=0.852..0.862 rows=20.00 loops=1)
+  Buffers: shared hit=60
+  ->  Sort  (cost=174.02..174.02 rows=1 width=49) (actual time=0.851..0.856 rows=20.00 loops=1)
+        Sort Key: o.created_at, o.id
+        Sort Method: quicksort  Memory: 20kB
+        Buffers: shared hit=60
+        ->  Hash Anti Join  (cost=71.94..174.01 rows=1 width=49) (actual time=0.819..0.838 rows=29.00 loops=1)
+              Hash Cond: (o.id = d.order_id)
+              Buffers: shared hit=60
+              ->  Index Scan using assignable_orders on orders o  (cost=0.26..102.21 rows=30 width=49) (actual time=0.010..0.018 rows=30.00 loops=1)
+                    Index Searches: 1
+                    Buffers: shared hit=14
+              ->  Hash  (cost=57.41..57.41 rows=1141 width=16) (actual time=0.803..0.804 rows=1141.00 loops=1)
+                    Buckets: 2048  Batches: 1  Memory Usage: 53kB
+                    Buffers: shared hit=46
+                    ->  Seq Scan on delivery d  (cost=0.00..57.41 rows=1141 width=16) (actual time=0.004..0.331 rows=1141.00 loops=1)
+                          Buffers: shared hit=46
+Planning:
+  Buffers: shared hit=12
+Planning Time: 0.145 ms
+Execution Time: 0.877 ms

@@ -1,0 +1,4 @@
+PostgreSQL 18.3 (PGlite 0.5.8) on wasm32-unknown-emscripten, compiled by emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 3.1.74 (1092ec30a3fb1d46b1782ff1b4db5094d3d06ae5), 32-bit
+PASS invalid insert 1: new row for relation "order_item" violates check constraint "order_item_quantity_check"
+PASS invalid insert 2: review_requires_delivered_order
+PASS invalid insert 3: one_active_delivery_per_courier
